@@ -1,4 +1,11 @@
 //functions for caculation
+//declare operator queue
+let operatorQueue = [];
+
+function addToOperatorQueue(inputOperator){
+    operatorQueue.push(inputOperator);
+}
+//operator fuctions
 function add(num1, num2) {
     return num1 + num2;
 }
@@ -15,21 +22,29 @@ function divide(num1, num2) {
     return num1 / num2;
 }
 
+//fuction to decide waht operator will call what function
 function operate(operator, num1, num2) {
     switch (operator) {
         case "+":
-            add(num1, num2);
-            break;
+            return add(num1, num2);   
         case "-":
-            substract(num1, num2);
-            break;
+            return substract(num1, num2);  
         case "x":
-            multiply(num1, num2);
-            break;
+            return multiply(num1, num2);
         case "÷":
-            divide(num1, num2);
-            break;
+            return divide(num1, num2);
     }
+}
+
+//function to begin calculation
+function beginCalculation(){
+
+    //the following logic is only applicable for two numbers with only one operator
+    //get the text from the display-div
+
+    let diplayString = document.getElementById("display-div").innerHTML;
+    let inputNumbers = diplayString.replace(/[^0-9]/g," ").split(" ").map((numberString) => parseInt(numberString));
+    document.getElementById("display-div").innerHTML = operate(operatorQueue[0], inputNumbers[0], inputNumbers[1]);
 }
 
 //functions for UI
@@ -58,24 +73,43 @@ function createNumberButtons() {
     }
 }
 
-//function to create operatorButtons
+//function to create operator buttons
 function createOperatorButtons() {
-    let operatorSymbolArray = ["+", "-", "x", "÷"];
+    let operatorSymbolArray = ["+", "-", "x", "÷", "="];
     operatorButtonContainer = document.getElementById("operator-button-container");
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i <= 4; i++) {
         let operatorButton = document.createElement("button");
         operatorButton.value = operatorSymbolArray[i];
         operatorButton.innerText = operatorSymbolArray[i];
         operatorButton.classList.add("operator-button");
-        operatorButton.addEventListener("click", (e) => addToDisplay(e.target.innerText));
+        if(i != 4){
+            operatorButton.addEventListener("click", (e) => addToDisplay(e.target.innerText));      
+            operatorButton.addEventListener("click", (e) => addToOperatorQueue(e.target.innerText));
+        }else{
+            operatorButton.addEventListener("click", (e) => beginCalculation());
+        }
         operatorButtonContainer.appendChild(operatorButton);
     }
+}
 
+//function to create clear button
+function createClearButton(){
+    operatorButtonContainer = document.getElementById("operator-button-container");
     let operatorButton = document.createElement("button");
-    operatorButton.value = "=";
-    operatorButton.innerText = "=";
+    operatorButton.value = "c";
+    operatorButton.innerText = "c"
     operatorButton.classList.add("operator-button");
+    operatorButton.addEventListener("click", (e) => clear());
     operatorButtonContainer.appendChild(operatorButton);
 }
+//fuction for clear
+function clear(){
+    //clear the display-div and operatorQueue 
+    operatorQueue = [];
+    document.getElementById("display-div").innerHTML = '';
+}
+
+//create equation button
 window.addEventListener("load", createNumberButtons());
 window.addEventListener("load", createOperatorButtons());
+window.addEventListener("load", createClearButton());
