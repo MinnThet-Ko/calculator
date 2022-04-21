@@ -59,18 +59,24 @@ let lastAddedString = ''
 function addToDisplay(inputString) {
     let operatorSymbolArray = ["+", "-", "x", "÷", "="];
     displayDiv = document.getElementById("display-div");
-    if(inputString === '.'){
-        if(isDecimal == false){
-            isDecimal == true;
-        }else if(isDecimal ==  false || lastAddedString === '.'){
-            return;
-        }
-    }else if(lastAddedString == '.' && operatorSymbolArray.includes(inputString)|| 
-            inputString === '.' && lastAddedString === '.'||
-            operatorSymbolArray.includes(lastAddedString) && operatorSymbolArray.includes(inputString)||
-            lastAddedString == '' && operatorSymbolArray.includes(inputString)){
+
+    //if the input is decimal, declare that the current number is a float
+    if(inputString === '.' && isDecimal == false){
+        isDecimal = true;
+    }else if(inputString === '.' && isDecimal == true){
         return;
-    }else if(operatorSymbolArray.includes(inputString)){
+    }
+
+    //If the user tries to put in an another decimal point
+    if(inputString === '.' && lastAddedString === '.'){
+        return;
+    }
+
+    if(lastAddedString == '.' && operatorSymbolArray.includes(inputString)|| 
+        operatorSymbolArray.includes(lastAddedString) && operatorSymbolArray.includes(inputString)||
+        lastAddedString == '' && operatorSymbolArray.includes(inputString)){
+        return;
+    }if(operatorSymbolArray.includes(inputString)){
         isDecimal = false;
     }
 
@@ -104,7 +110,6 @@ function createDecimalPointButton(){
     decimalPointButton.classList.add("number-button");
     decimalPointButton.addEventListener("click", (e) => addToDisplay(e.target.innerText));
     numberButtonContainer.appendChild(decimalPointButton);
-
 }
 
 //function to create operator buttons
@@ -144,6 +149,7 @@ function clear(){
     //clear the display-div and operatorQueue 
     operatorQueue = [];
     document.getElementById("display-div").innerHTML = '';
+    isDecimal = false;
 }
 
 //create equation button
