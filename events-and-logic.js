@@ -5,6 +5,7 @@ let operatorQueue = [];
 function addToOperatorQueue(inputOperator){
     operatorQueue.push(inputOperator);
 }
+
 //operator fuctions
 function add(num1, num2) {
     return num1 + num2;
@@ -43,21 +44,42 @@ function beginCalculation(){
     //get the text from the display-div
 
     let diplayString = document.getElementById("display-div").innerHTML;
-    let inputNumbers = diplayString.replace(/[^0-9]/g," ").split(" ").map((numberString) => parseInt(numberString));
+    let inputNumbers = diplayString.replace(/[^.0-9]/g," ").split(" ").map((numberString) => parseFloat(numberString));
     document.getElementById("display-div").innerHTML = operate(operatorQueue[0], inputNumbers[0], inputNumbers[1]);
+    operatorQueue = [];
+
 }
 
 //functions for UI
 
+//variable to check whether the decimal point has be added
+let isDecimal =  false;
+let lastAddedString = ''
 //function to add text to display-div
 function addToDisplay(inputString) {
+    let operatorSymbolArray = ["+", "-", "x", "÷", "="];
     displayDiv = document.getElementById("display-div");
+    if(inputString === '.'){
+        if(isDecimal == false){
+            isDecimal == true;
+        }else if(isDecimal ==  false || lastAddedString === '.'){
+            return;
+        }
+    }else if(lastAddedString == '.' && operatorSymbolArray.includes(inputString)|| 
+            inputString === '.' && lastAddedString === '.'||
+            operatorSymbolArray.includes(lastAddedString) && operatorSymbolArray.includes(inputString)||
+            lastAddedString == '' && operatorSymbolArray.includes(inputString)){
+        return;
+    }else if(operatorSymbolArray.includes(inputString)){
+        isDecimal = false;
+    }
+
     if (displayDiv.innerText == null) {
         displayDiv.innerText = inputString;
     } else {
         displayDiv.innerText += inputString;
     }
-
+    lastAddedString = inputString;
 }
 
 //function to create number buttons
@@ -71,6 +93,18 @@ function createNumberButtons() {
         numberButton.addEventListener("click", (e) => addToDisplay(e.target.innerText));
         numberButtonContainer.appendChild(numberButton);
     }
+}
+
+//function to create decimal point button
+function createDecimalPointButton(){
+    numberButtonContainer = document.getElementById("number-button-container");
+    let decimalPointButton = document.createElement("button");
+    decimalPointButton.value = ".";
+    decimalPointButton.innerText = ".";
+    decimalPointButton.classList.add("number-button");
+    decimalPointButton.addEventListener("click", (e) => addToDisplay(e.target.innerText));
+    numberButtonContainer.appendChild(decimalPointButton);
+
 }
 
 //function to create operator buttons
@@ -87,6 +121,7 @@ function createOperatorButtons() {
             operatorButton.addEventListener("click", (e) => addToOperatorQueue(e.target.innerText));
         }else{
             operatorButton.addEventListener("click", (e) => beginCalculation());
+            operatorButton.style.height = "200px";
         }
         operatorButtonContainer.appendChild(operatorButton);
     }
@@ -95,13 +130,15 @@ function createOperatorButtons() {
 //function to create clear button
 function createClearButton(){
     operatorButtonContainer = document.getElementById("operator-button-container");
-    let operatorButton = document.createElement("button");
-    operatorButton.value = "c";
-    operatorButton.innerText = "c"
-    operatorButton.classList.add("operator-button");
-    operatorButton.addEventListener("click", (e) => clear());
-    operatorButtonContainer.appendChild(operatorButton);
+    let clearButton = document.createElement("button");
+    clearButton.value = "c";
+    clearButton.innerText = "c"
+    clearButton.classList.add("operator-button");
+    clearButton.addEventListener("click", (e) => clear());
+    clearButton.style.height = "200px";
+    operatorButtonContainer.appendChild(clearButton);
 }
+
 //fuction for clear
 function clear(){
     //clear the display-div and operatorQueue 
@@ -113,3 +150,4 @@ function clear(){
 window.addEventListener("load", createNumberButtons());
 window.addEventListener("load", createOperatorButtons());
 window.addEventListener("load", createClearButton());
+window.addEventListener("load", createDecimalPointButton());
